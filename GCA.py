@@ -229,27 +229,34 @@ if st.button("🚀 Generate Arrangement"):
 
     # Display result in Streamlit
     output_text = buffer.getvalue()
-    edited_text = st.text_area("Transport Arrangement Message", output_text, height=600)
 
-    encoded_msg = urllib.parse.quote(edited_text, safe='')
+    # Initialize state once
+    if "message" not in st.session_state:
+        st.session_state.message = output_text
+
+    # Editable text area
+    st.session_state.message = st.text_area(
+        "Transport Arrangement Message",
+        st.session_state.message,
+        height=600,
+    )
+
+    encoded_msg = urllib.parse.quote(st.session_state.message, safe='')
     encoded_msg = encoded_msg.replace("%0A", "%0A")
 
-    whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
-
-    st.markdown(
-        f"""
-        <a href="{whatsapp_url}" target="_blank" style="text-decoration:none;">
-            <button style="
-                background-color:#25D366;
+    copy_button = f"""
+    <button onclick="navigator.clipboard.writeText(`{encoded_msg}`); 
+            alert('Copied!');"
+            style="
+                background-color:#4CAF50;
                 color:white;
                 border:none;
                 border-radius:8px;
                 padding:6px 10px;
                 font-size:16px;
                 cursor:pointer;">
-                📤 Share via WhatsApp
-            </button>
-        </a>
-        """,
-        unsafe_allow_html=True
-    )
+        📋 Copy Message
+    </button>
+    """
+
+    st.markdown(copy_button, unsafe_allow_html=True)
