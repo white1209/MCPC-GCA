@@ -1,10 +1,11 @@
-import streamlit as st # type: ignore
-import pandas as pd
-import openrouteservice
-from itertools import permutations
-from datetime import datetime, timedelta
 import io
 import sys
+import urllib.parse
+import pandas as pd
+import openrouteservice
+import streamlit as st # type: ignore
+from itertools import permutations
+from datetime import datetime, timedelta
 
 # --- ORS API Key ---
 ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjViMjBkMzNjZmJlYjQ4OTg4OWE4ZjYzYjQzMTQ4MDMxIiwiaCI6Im11cm11cjY0In0="
@@ -228,10 +229,9 @@ if st.button("🚀 Generate Arrangement"):
 
     # Display result in Streamlit
     output_text = buffer.getvalue()
-    st.text_area("Transport Arrangement Message", output_text, height=600)
+    edited_text = st.text_area("Transport Arrangement Message", output_text, height=600)
 
-    import urllib.parse
-    encoded_msg = urllib.parse.quote(output_text, safe='')
+    encoded_msg = urllib.parse.quote(edited_text, safe='')
     encoded_msg = encoded_msg.replace("%0A", "%0A")
 
     whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
@@ -252,4 +252,4 @@ if st.button("🚀 Generate Arrangement"):
         </a>
         """,
         unsafe_allow_html=True
-)
+    )
