@@ -3,7 +3,7 @@ import sys
 import urllib.parse
 import pandas as pd
 import openrouteservice
-import streamlit as st # type: ignore
+import streamlit as st 
 from itertools import permutations
 from datetime import datetime, timedelta
 
@@ -229,28 +229,5 @@ if st.button("🚀 Generate Arrangement"):
 
     # Display result in Streamlit
     output_text = buffer.getvalue()
-    st.text_area("Transport Arrangement Message", output_text, height=600)
+    st.code(output_text, language="text")
 
-    import urllib.parse
-    encoded_msg = urllib.parse.quote(output_text, safe='')
-    encoded_msg = encoded_msg.replace("%0A", "%0A")
-
-    whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
-
-    st.markdown(
-        f"""
-        <a href="{whatsapp_url}" target="_blank" style="text-decoration:none;">
-            <button style="
-                background-color:#25D366;
-                color:white;
-                border:none;
-                border-radius:8px;
-                padding:6px 10px;
-                font-size:16px;
-                cursor:pointer;">
-                📤 Share via WhatsApp
-            </button>
-        </a>
-        """,
-        unsafe_allow_html=True
-)
