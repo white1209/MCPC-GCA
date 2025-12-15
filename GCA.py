@@ -35,8 +35,8 @@ if st.button("🚀 Generate Arrangement"):
             "mutiara": "Mutiara Ville",
             "shaftsbury putrajaya": "Shaftsbury Putrajaya",
             "shaft": "Shaftsbury Cyberjaya",
-            "edu": "Edusphere",
-            "lake": "Lakepoint Residence",
+            "edu": "Edusphere Suites",
+            "lakepoint": "Lakepoint Residence",
             "mmu": "MMU Bus Stop",
             "serin": "Serin Residency",
             "cyberia" : "Cyberia Smarthomes"
@@ -53,7 +53,7 @@ if st.button("🚀 Generate Arrangement"):
         "MCPC": (2.9170225107127488, 101.6498633796812),
         "The Arc": (2.9257629643936376, 101.63683861036628),
         "Mutiara Ville": (2.922350609640224, 101.6350686085168),
-        "Edusphere": (2.9321189224611715, 101.6376606680376),
+        "Edusphere Suites": (2.9321189224611715, 101.6376606680376),
         "Hyve": (2.92084108875226, 101.6610653950237),
         "Lakepoint Residence": (2.9289648854261663, 101.63512724947454),
         "Shaftsbury Cyberjaya": (2.9244692894170193, 101.65755849840291),
@@ -127,57 +127,97 @@ if st.button("🚀 Generate Arrangement"):
         coming_sunday = today + timedelta(days=days_until_sunday)
         sunday_date = coming_sunday.strftime("%d %B %Y")
         pax_count = df["Name"].dropna().astype(str).str.strip().ne("").sum()
-        print(f"Hi everyone, this is the transport arrangement brief for Sunday Service on {sunday_date}.\n")
-        print(f"Vehicle: Alza VJY3510 \nPax: {pax_count}\n")
+        print(f"Hi Everyone, this is the transport arrangement brief for Sunday Service on {sunday_date}.\n")
+        print(f"Vehicle: Alza VJY3510 \nDriver: \nPax: {pax_count}\n")
 
     def generate_worship_enablers_trip(df):
         worship_df = df[df["Worship Enablers"].notna()]
-        worship_group = worship_df.groupby("Place_Normalize")["Name"].apply(list).to_dict() if not worship_df.empty else {}
+        worship_group = (
+            worship_df.groupby("Place_Normalize")["Name"].apply(list).to_dict()
+            if not worship_df.empty else {}
+        )
+
         if worship_group:
-            print(f"💒 Worship Enablers Trip\n")
+            print("💒 Worship Enablers Trip\n")
+
+        worship_order = prioritize_hyve_order(list(worship_group.keys()))
         total_travel_minutes = 0
-        worship_order = list(worship_group.keys())
+        previous_venue = "MCPC" 
+
         for venue in worship_order:
-            if venue in coords:
-                d = distances[names.index("MCPC")][names.index(normalize_place(venue))]
+            place = normalize_place(venue)
+            if place in coords:
+                d = distances[names.index(previous_venue)][names.index(place)]
                 total_travel_minutes += estimate_travel_time(d)
-        total_travel_minutes += 10
+                previous_venue = place
+        total_travel_minutes += 10 
+
         arrival_time = datetime.strptime("09:00", "%H:%M")
         depart_time = arrival_time - timedelta(minutes=total_travel_minutes)
         current_time = depart_time
+        previous_venue = "MCPC" 
+
         for venue in worship_order:
-            if venue in coords:
-                d = distances[names.index("MCPC")][names.index(normalize_place(venue))]
+            place = normalize_place(venue)
+            if place in coords:
+                d = distances[names.index(previous_venue)][names.index(place)]
                 travel_minutes = estimate_travel_time(d)
                 current_time += timedelta(minutes=travel_minutes)
-            print(f"{normalize_place(venue)} — ETA: {current_time.strftime('%I:%M %p')}")
+                previous_venue = place
+
+            print(f"{place} - {current_time.strftime('%I:%M %p')}")
             for n in worship_group[venue]:
                 print(f"   - {n}")
             print()
 
     def generate_departure_trip():
         start_time = datetime.strptime("09:15", "%H:%M")
-        departure_df = df[df["Departure Trip"] == 1]
-        departure_grouped = departure_df.groupby("Place_Normalize")["Name"].apply(list).to_dict()
-        for trip_num, trip_venues in enumerate(trips, start=1):
+
+        departure_df = df[df["Departure Trip"].fillna(0) > 0]
+
+        departure_grouped = (
+            departure_df
+            .groupby("Place_Normalize")[["Name", "Departure Trip"]]
+            .apply(lambda x: x.to_dict("records"))
+            .to_dict()
+        )
+
+        ordered_trips = prioritize_hyve_trip(trips)
+
+        for trip_num, trip_venues in enumerate(ordered_trips, start=1):
+            trip_venues = prioritize_hyve_order(trip_venues)
             print(f"🚐 Departure Trip {trip_num}\n")
             current_time = start_time
             previous_venue = "MCPC"
+
             for venue, _ in trip_venues:
-                if venue.lower() not in departure_grouped:
+                key = venue.lower()
+                if key not in departure_grouped:
                     continue
+
                 d = distances[names.index(previous_venue)][names.index(venue)]
                 travel_minutes = estimate_travel_time(d)
                 current_time += timedelta(minutes=travel_minutes)
-                print(f"{venue} — ETA: {current_time.strftime('%I:%M %p')}")
-                for name in departure_grouped[venue.lower()]:
-                    print(f"   - {name}")
+
+                print(f"{venue} - {current_time.strftime('%I:%M %p')}")
+
+                for person in departure_grouped[key]:
+                    name = person["Name"]
+                    count = int(person["Departure Trip"])
+
+                    if count == 1:
+                        print(f"   - {name}")
+                    else:
+                        print(f"   - {name} x {count}")
+
                 print()
                 previous_venue = venue
+
             d_back = distances[names.index(previous_venue)][names.index("MCPC")]
             travel_back = estimate_travel_time(d_back)
             current_time += timedelta(minutes=travel_back)
-            print(f"(Depart to MCPC)\n")
+            print("(Depart to MCPC)\n")
+
             start_time = current_time
 
     def generate_carpool_trip(df):
@@ -187,7 +227,7 @@ if st.button("🚀 Generate Arrangement"):
             if pd.notna(place) and place not in coords:
                 carpool_group.append(row["Name"])
         if carpool_group:
-            print("🚗 Car Pool — ETA: 10:00 AM")
+            print("🚗 Car Pool - 10:00 AM")
             for name in carpool_group:
                 print(f"   - {name}")
             print()
@@ -197,7 +237,7 @@ if st.button("🚀 Generate Arrangement"):
         after_service_group = after_service_df.groupby("Place_Normalize")["Name"].apply(list).to_dict() if not after_service_df.empty else {}
         if after_service_group:
             print("🏠 After Service")
-            print("Carpool")
+            print("Carpool with ")
             counter = 1
             for venue, names_list in after_service_group.items():
                 for name in names_list:
@@ -218,6 +258,29 @@ if st.button("🚀 Generate Arrangement"):
                     counter += 1
             print()
 
+    def prioritize_hyve_order(venues):
+        hyve = []
+        others = []
+
+        for v in venues:
+            name = v[0] if isinstance(v, tuple) else v
+            if name.lower() == "hyve":
+                hyve.append(v)
+            else:
+                others.append(v)
+        return hyve + others
+    
+    def prioritize_hyve_trip(trips):
+        hyve_trip = []
+        other_trips = []
+
+        for trip in trips:
+            if any(venue.lower() == "hyve" for venue, _ in trip):
+                hyve_trip.append(trip)
+            else:
+                other_trips.append(trip)
+        return hyve_trip + other_trips
+
     # --- Output Section ---
     generate_transport_brief(df)
     generate_worship_enablers_trip(df)
@@ -232,5 +295,3 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
-
-
