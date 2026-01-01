@@ -241,6 +241,14 @@ if st.button("🚀 Generate Arrangement"):
             print()
 
     def generate_after_service_trip(df):
+        mask = (
+            df["After Service"].notna()
+        ) & (
+            df["After Youth Fellowship"].notna()
+        )
+
+        df.loc[mask, "After Service"] = None
+
         after_service_df = df[df["After Service"].notna()]
         after_service_group = after_service_df.groupby("Place_Normalize")["Name"].apply(list).to_dict() if not after_service_df.empty else {}
         if after_service_group:
