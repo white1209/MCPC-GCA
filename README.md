@@ -1,6 +1,6 @@
-The MCPC Gospel Car Arrangement System is an automated transport-planning application designed to efficiently organize Sunday service transportation for church members. Built using Python and Streamlit, the system integrates Google Sheets, OpenRouteService (ORS), and intelligent routing logic to generate a clear, structured transport arrangement with minimal manual effort.
+The **MCPC Gospel Car Arrangement System** is an automated transport-planning application designed to efficiently organize Sunday service transportation for church members. Built using Python and Streamlit, the system integrates *Google Sheets*, *OpenRouteService* (ORS), and intelligent routing logic to generate a clear, structured transport arrangement with minimal manual effort.
 
-The system retrieves participant data directly from a Google Sheet, normalizes pickup locations, and maps them to predefined geographic coordinates. Using OpenRouteService’s distance matrix, it calculates optimal driving routes and determines the most efficient pickup sequence that minimizes total travel distance.
+The system retrieves participant data directly from a *Google Sheet*, normalizes pickup locations, and maps them to predefined geographic coordinates. Using *OpenRouteService*’s distance matrix, it calculates optimal driving routes and determines the most efficient pickup sequence that minimizes total travel distance.
 
 To ensure smooth operations, the system intelligently:
 1. Separates worship enablers into an early trip with adjusted departure times
