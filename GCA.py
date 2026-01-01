@@ -109,9 +109,11 @@ if st.button("🚀 Generate Arrangement"):
 
     # --- Car Capacity Grouping ---
     CAR_CAPACITY = 6
+    start_time = datetime.strptime("09:35", "%H:%M")
     trips, current_trip, current_total = [], [], 0
     for venue, count in venue_counts:
         if current_total + count > CAR_CAPACITY and current_trip:
+            start_time = datetime.strptime("09:15", "%H:%M")
             trips.append(current_trip)
             current_trip = []
             current_total = 0
@@ -170,8 +172,14 @@ if st.button("🚀 Generate Arrangement"):
                 print(f"   - {n}")
             print()
 
-    def generate_departure_trip():
-        start_time = datetime.strptime("09:15", "%H:%M")
+    def generate_departure_trip(start_time):
+        mask = (
+            df["Departure Trip"].fillna(0) > 0
+        ) & (
+            df["Worship Enablers"].notna()
+        )
+
+        df.loc[mask, "Departure Trip"] = None
 
         departure_df = df[df["Departure Trip"].fillna(0) > 0]
 
@@ -284,7 +292,7 @@ if st.button("🚀 Generate Arrangement"):
     # --- Output Section ---
     generate_transport_brief(df)
     generate_worship_enablers_trip(df)
-    generate_departure_trip()
+    generate_departure_trip(start_time)
     generate_carpool_trip(df)
     generate_after_service_trip(df)
     generate_after_youth_trip(df)
