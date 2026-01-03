@@ -6,3 +6,4 @@ plotly
 xgboost
 supabase
 python-dotenv
+openrouteservice
