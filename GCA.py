@@ -112,17 +112,46 @@ if st.button("🚀 Generate Arrangement"):
     # --- Car Capacity Grouping ---
     CAR_CAPACITY = 6
     start_time = datetime.strptime("09:35", "%H:%M")
-    trips, current_trip, current_total = [], [], 0
+    trips, trip_totals = [], []
+    current_trip, current_total = [], 0
+
     for venue, count in venue_counts:
         if current_total + count > CAR_CAPACITY and current_trip:
-            start_time = datetime.strptime("09:15", "%H:%M")
+            start_time = datetime.strptime("09:25", "%H:%M")
             trips.append(current_trip)
-            current_trip = []
-            current_total = 0
+            trip_totals.append(current_total)
+            current_trip, current_total = [], 0
         current_trip.append((venue, count))
         current_total += count
+
     if current_trip:
         trips.append(current_trip)
+        trip_totals.append(current_total)
+
+    # --- Balance the Trip ---
+    if len(trips) >= 2:
+        t1, t2 = trips[0], trips[1]
+        p1, p2 = trip_totals[0], trip_totals[1]
+
+        while abs(p1 - p2) > 2:
+            if p1 > p2:
+                venue, count = t1.pop()
+                if p2 + count > CAR_CAPACITY:
+                    t1.append((venue, count))
+                    break
+                t2.insert(0, (venue, count))
+                p1 -= count
+                p2 += count
+            else:
+                venue, count = t2.pop()
+                if p1 + count > CAR_CAPACITY:
+                    t2.append((venue, count))
+                    break
+                t1.append((venue, count))
+                p2 -= count
+                p1 += count
+
+        trip_totals[0], trip_totals[1] = p1, p2
 
     # --- Arrangement Function ---
     def generate_transport_brief(df):
@@ -313,6 +342,3 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
-
-
-
