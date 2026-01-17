@@ -293,16 +293,28 @@ if st.button("🚀 Generate Arrangement"):
             print()
 
     def generate_after_youth_trip(df):
-        after_youth_df = df[df["After Youth Fellowship"].notna()]
-        after_youth_group = after_youth_df.groupby("Place_Normalize")["Name"].apply(list).to_dict() if not after_youth_df.empty else {}
+        after_youth_df = df[df["After Youth Fellowship"].fillna(0) > 0]
+        after_youth_group = (
+            after_youth_df
+            .groupby("Place_Normalize")[["Name", "After Youth Fellowship"]]
+            .apply(lambda x: x.to_dict("records"))
+            .to_dict()
+        )
         if after_youth_group:
             print("🏠 After Youth Fellowship")
             print("Gospel Van")
             counter = 1
             for venue, names_list in after_youth_group.items():
-                for name in names_list:
-                    print(f"{counter}. {name}")
-                    counter += 1
+                for person in names_list: 
+                    name = person["Name"] 
+                    count = int(person["After Youth Fellowship"])
+
+                    if count == 1: 
+                        print(f"{counter}. {name}")
+                        counter += 1
+                    else: 
+                        print(f"{counter}. {name} x {count}")
+                        counter += 1
             print()
 
     def prioritize_hyve_order(venues):
