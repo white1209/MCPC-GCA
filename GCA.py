@@ -33,7 +33,7 @@ if st.button("🚀 Generate Arrangement"):
             "arc": "The Arc",
             "mv": "Mutiara Ville",
             "mutiara": "Mutiara Ville",
-            "hyve": "Hyve Soho",
+            "hyve": "Hyve",
             "shaft": "Shaftsbury Cyberjaya",
             "edu": "Edusphere Suites",
             "lakepoint": "Lakepoint Residence",
@@ -313,5 +313,6 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
+
 
 
