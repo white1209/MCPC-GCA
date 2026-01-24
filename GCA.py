@@ -117,7 +117,7 @@ if st.button("🚀 Generate Arrangement"):
 
     for venue, count in venue_counts:
         if current_total + count > CAR_CAPACITY and current_trip:
-            start_time = datetime.strptime("09:25", "%H:%M")
+            start_time = datetime.strptime("09:15", "%H:%M")
             trips.append(current_trip)
             trip_totals.append(current_total)
             current_trip, current_total = [], 0
@@ -354,3 +354,4 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
+
