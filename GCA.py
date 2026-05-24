@@ -42,7 +42,9 @@ if st.button("🚀 Generate Arrangement"):
             "cyberia" : "Cyberia Smarthomes",
             "kanvas" : "Kanvas Soho",
             "skypark" : "Skypark Cyberjaya",
-            "solstice" : "Solstice Residence"
+            "solstice" : "Solstice Residence",
+            "elc" : "ELC International School",
+            "tamarind": "Tamarind Square"
 
         }
         for key, value in mapping.items():
@@ -66,7 +68,9 @@ if st.button("🚀 Generate Arrangement"):
         "Cyberia Smarthomes": (2.9245808185579234, 101.63811382049808),
         "Kanvas Soho": (2.913408961152836, 101.65476763550302),
         "Skypark Cyberjaya": (2.948909575003327, 101.654727269887),
-        "Solstice Residence":(2.924942862632289, 101.63657948444916)
+        "Solstice Residence": (2.924942862632289, 101.63657948444916),
+        "ELC International School": (2.927222368015103, 101.64777737968119),
+        "Tamarind Square": (2.921665009778338, 101.63661509687317)
     }
 
     locs = [[v[1], v[0]] for v in coords.values()]
