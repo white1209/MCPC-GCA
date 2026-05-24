@@ -41,7 +41,9 @@ if st.button("🚀 Generate Arrangement"):
             "serin": "Serin Residency",
             "cyberia" : "Cyberia Smarthomes",
             "kanvas" : "Kanvas Soho",
-            "skypark" : "Skypark Cyberjaya"
+            "skypark" : "Skypark Cyberjaya",
+            "solstice" : "Solstice Residence"
+
         }
         for key, value in mapping.items():
             if key in p:
@@ -63,7 +65,8 @@ if st.button("🚀 Generate Arrangement"):
         "Serin Residency": (2.916432495889349, 101.6457637950237),
         "Cyberia Smarthomes": (2.9245808185579234, 101.63811382049808),
         "Kanvas Soho": (2.913408961152836, 101.65476763550302),
-        "Skypark Cyberjaya": (2.948909575003327, 101.654727269887)
+        "Skypark Cyberjaya": (2.948909575003327, 101.654727269887),
+        "Solstice Residence":(2.924942862632289, 101.63657948444916)
     }
 
     locs = [[v[1], v[0]] for v in coords.values()]
@@ -98,12 +101,8 @@ if st.button("🚀 Generate Arrangement"):
             return 5
         elif distance_km < 4:
             return 10
-        elif distance_km < 6:
-            return 15
-        elif distance_km < 8:
-            return 20
         else:
-            return 25
+            return 15
 
     # --- Venue Grouping ---
     df["Place_Normalize"] = df["Place"].str.lower()
@@ -113,7 +112,7 @@ if st.button("🚀 Generate Arrangement"):
 
     # --- Car Capacity Grouping ---
     CAR_CAPACITY = 6
-    start_time = datetime.strptime("09:35", "%H:%M")
+    start_time = datetime.strptime("09:30", "%H:%M")
     trips, trip_totals = [], []
     current_trip, current_total = [], 0
 
@@ -356,5 +355,4 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
-
 
