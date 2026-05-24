@@ -85,15 +85,28 @@ if st.button("🚀 Generate Arrangement"):
         return sum(distances[names.index(route[i])][names.index(route[i+1])] for i in range(len(route)-1))
 
     # --- Find Best Route ---
+    def find_fast_route(start, places):
+        unvisited = places[:]
+        route = [start]
+        current = start
+
+        while unvisited:
+            nearest = min(
+                unvisited,
+                key=lambda x: distances[names.index(current)][names.index(x)]
+            )
+
+            route.append(nearest)
+            unvisited.remove(nearest)
+            current = nearest
+
+        route.append(start)
+        return route
+
     start = "MCPC"
     places = [p for p in names if p != start]
-    best_route, best_dist = None, float("inf")
-    for perm in permutations(places):
-        route = [start] + list(perm) + [start]
-        dist = total_distance(route)
-        if dist < best_dist:
-            best_dist = dist
-            best_route = route
+
+    best_route = find_fast_route(start, places)
 
     # --- ETA ---
     def estimate_travel_time(distance_km):
@@ -355,4 +368,3 @@ if st.button("🚀 Generate Arrangement"):
     # Display result in Streamlit
     output_text = buffer.getvalue()
     st.code(output_text, language="text")
-
